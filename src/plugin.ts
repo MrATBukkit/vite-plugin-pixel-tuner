@@ -75,16 +75,17 @@ export function VitePixelTuner(): Plugin {// Variable, um den Wurzelpfad zu spei
                 const width = parseInt(params.get('width') || '0', 10);
                 const height = parseInt(params.get('height') || '0', 10);
                 const format = params.get('format') || fileExtension;
-
-                //const outputDir = path.join(config.root, config.build.outDir, config.build.assetsDir);// Zum Beispiel: alle bearbeiteten Bilder im "assets"-Ordner speichern.
-                //const outputPath = path.join(outputDir, `${path.basename(filePath, path.extname(filePath))}-${width}x${height}.${format}`);
-
+                const quality = parseInt(params.get('quality') || '100', 10);
 
                 const absolutePath = path.join(config.root, 'src', filePath);
                 const image = sharp(absolutePath);
 
                 if (width || height) {
                     image.resize(width || undefined, height || undefined);
+                }
+
+                if (quality < 100) {
+                    image.jpeg({quality});
                 }
 
                 if (format) {
