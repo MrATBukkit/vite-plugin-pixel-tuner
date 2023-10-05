@@ -93,22 +93,28 @@ export function VitePixelTuner(): Plugin {// Variable, um den Wurzelpfad zu spei
                 }
 
                 const imageBuffer = await image.toBuffer();
-                const hash = crypto.createHash('sha256').update(imageBuffer).digest('hex');
-                const hashedFilename = `${path.basename(filePath, path.extname(filePath))}-${hash}.${format}`;
-                const tempImagePath = path.join(tempDir, hashedFilename);
 
-                try {
-                    await fsPromises.writeFile(tempImagePath, imageBuffer);
-                } catch (err) {
-                    console.error(`Fehler beim Speichern des Bildes: ${err.message}`);
-                    throw err;
+                if (config.command === 'serve') { // Wenn in Entwicklungsmodus
+                    const base64Image = imageBuffer.toString('base64');
+                    return `export default "data:image/${format};base64,${base64Image}"`;
+                } else {
+                    const hash = crypto.createHash('sha256').update(imageBuffer).digest('hex');
+                    const hashedFilename = `${path.basename(filePath, path.extname(filePath))}-${hash}.${format}`;
+                    const tempImagePath = path.join(tempDir, hashedFilename);
+
+                    try {
+                        await fsPromises.writeFile(tempImagePath, imageBuffer);
+                    } catch (err) {
+                        console.error(`Fehler beim Speichern des Bildes: ${err.message}`);
+                        throw err;
+                    }
+
+                    idMap[id]['filePath'] = tempImagePath;
+                    idMap[id]['hashedFilename'] = hashedFilename;
+
+                    const publicImagePath = '/' + config.build.assetsDir + '/' + hashedFilename;
+                    return `export default "${publicImagePath}"`;
                 }
-
-                idMap[id]['filePath'] = tempImagePath;
-                idMap[id]['hashedFilename'] = hashedFilename;  // Speichern Sie den hash-basierten Dateinamen
-
-                const publicImagePath = '/' + config.build.assetsDir + '/' + hashedFilename;
-                return `export default "${publicImagePath}"`;
             }
         },
     };
