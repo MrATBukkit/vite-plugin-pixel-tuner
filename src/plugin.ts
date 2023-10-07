@@ -59,7 +59,7 @@ export function VitePixelTuner(): Plugin {// Variable, um den Wurzelpfad zu spei
                 const width = params.get('width') || params.get('w') || '0';
                 const height = params.get('height') || params.get('h') || '0';
                 const quality = params.get('quality') || params.get('q') || '100';
-                const newId = normalizePath(path.join(dir, `${filePath}-w${width}-h${height}-q${quality}.${fileExtension}`));
+                const newId = normalizePath(path.join(dir, `${name}-w${width}-h${height}-q${quality}.${fileExtension}`));
 
                 idMap[newId] = {filePath, query, hashedFilename: undefined};
 
