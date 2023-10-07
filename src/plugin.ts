@@ -56,8 +56,10 @@ export function VitePixelTuner(): Plugin {// Variable, um den Wurzelpfad zu spei
             if (['png', 'jpg', 'jpeg', 'gif'].includes(fileExtension) && query) {
                 const {dir, name} = path.parse(filePath);
                 const params = new URLSearchParams(query);
-                const width = parseInt(params.get('width') || '0', 10);
-                const newId = normalizePath(path.join(dir, `${name}-${width}.${fileExtension}`));
+                const width = params.get('width') || params.get('w') || '0';
+                const height = params.get('height') || params.get('h') || '0';
+                const quality = params.get('quality') || params.get('q') || '100';
+                const newId = normalizePath(path.join(dir, `${filePath}-w${width}-h${height}-q${quality}.${fileExtension}`));
 
                 idMap[newId] = {filePath, query, hashedFilename: undefined};
 
@@ -72,10 +74,10 @@ export function VitePixelTuner(): Plugin {// Variable, um den Wurzelpfad zu spei
             if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(fileExtension) && idMap[id]) {
                 const {filePath, query} = idMap[id];
                 const params = new URLSearchParams(query);
-                const width = parseInt(params.get('width') || '0', 10);
-                const height = parseInt(params.get('height') || '0', 10);
+                const width = parseInt(params.get('width') || params.get('w') || '0', 10);
+                const height = parseInt(params.get('height') || params.get('h') || '0', 10);
                 const format = params.get('format') || fileExtension;
-                const quality = parseInt(params.get('quality') || '100', 10);
+                const quality = parseInt(params.get('quality') || params.get('q') || '100', 10);
 
                 const absolutePath = path.join(config.root, 'src', filePath);
                 const image = sharp(absolutePath);
